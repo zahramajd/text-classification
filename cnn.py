@@ -22,16 +22,18 @@ import matplotlib.pyplot as plt
 
 from hazm import *
 
-def read_data(data_path, label_number):
 
+def read_data(data_path, label_number):
     with open(data_path, "r", encoding="utf-8") as data_file:
         data_file = data_file.read()
         data_file = data_file.replace("\u220c", "")
 
     data = np.array(data_file.split('\n')).reshape(-1, 1)
+
     ## TODO NEED NORMALIZATION
-    normalizer = Normalizer()
+    # normalizer = Normalizer()
     # nText = normalizer.normalize(x)
+    ##
 
     label = np.empty(data.shape, dtype=int)
     label.fill(label_number)
@@ -137,13 +139,13 @@ def main():
     for i in range(len(mypredicting)):
         mypredicting_max[i, :] = np.int8(mypredicting[i, :] == mypredicting[i, :].max())
     comparing = np.all(mypredicting_max == y_test, axis=1)
-    with open("./results/wrongAnswers" + '.csv', 'w') as f:
+    with open("./results/wrongAnswers/" + "cnn-no-embedding" + '.csv', 'w') as f:
         f.write("جمله" + "," + "نوع تشخیص" + "," + "پاسخ درست" + "\n")
         for i in range(len(comparing)):
             if comparing[i] == False:
                 f.write(x_test[i])
-                f.write("," + dictionaryOfTypes.get(mypredicting_max[i, :].max()))
-                f.write("," + dictionaryOfTypes.get(y_test[i, :].max()))
+                f.write("," + dictionaryOfTypes.get(np.argmax(mypredicting_max[i, :])))
+                f.write("," + dictionaryOfTypes.get(np.argmax(y_test[i, :])))
                 f.write("\n")
 
     ### LOAD and TEST model
@@ -169,7 +171,7 @@ def main():
     plt.plot(x, val_loss, 'r', label='Validation loss')
     plt.title('Training and validation loss')
     plt.legend()
-
+    plt.savefig("./results/" + "cnn-no-embedding2")
     plt.show()
 
 
