@@ -157,6 +157,8 @@ def main():
     ### k-fold analysis
     #TODO this task
 
+
+
     #### plot
     plt.style.use('ggplot')
 
@@ -170,12 +172,12 @@ def main():
     plt.subplot(1, 2, 1)
     plt.plot(x, acc, 'b', label='Training acc')
     plt.plot(x, val_acc, 'r', label='Validation acc')
-    plt.title('Training and validation accuracy')
+    plt.title('Training and validation accuracy, Test is: {:0.3f}'.format(accr[1]))
     plt.legend()
     plt.subplot(1, 2, 2)
     plt.plot(x, loss, 'b', label='Training loss')
     plt.plot(x, val_loss, 'r', label='Validation loss')
-    plt.title('Training and validation loss')
+    plt.title('Training and validation loss, Test is: {:0.3f}'.format(accr[0]))
     plt.legend()
     plt.savefig("./results/" + "cnn-no-embedding2")
     plt.show()
