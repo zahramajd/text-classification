@@ -5,6 +5,7 @@
 *.h5
 *.zip
 /data
+/resuts
 *.hdf5
 *.xml
 *.iml

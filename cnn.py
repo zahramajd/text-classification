@@ -20,13 +20,19 @@ import tensorflow.keras.backend as K
 
 import matplotlib.pyplot as plt
 
+from hazm import *
 
 def read_data(data_path, label_number):
+
     with open(data_path, "r", encoding="utf-8") as data_file:
         data_file = data_file.read()
         data_file = data_file.replace("\u220c", "")
 
     data = np.array(data_file.split('\n')).reshape(-1, 1)
+    ## TODO NEED NORMALIZATION
+    normalizer = Normalizer()
+    # nText = normalizer.normalize(x)
+
     label = np.empty(data.shape, dtype=int)
     label.fill(label_number)
 
@@ -51,7 +57,15 @@ def main():
     filter_sizes = [3, 4, 5]
     drop = 0.5
     batch_size = 30
-    epochs = 1
+    epochs = 20
+
+    dictionaryOfTypes = {5: "انتقال اطلاعات",
+                         2: "دستوري",
+                         6: "روايت كردن مطلب",
+                         0: "پرسشي",
+                         4: "نقل قول",
+                         1: "خواهشي",
+                         3: "تهديد"}
 
     data_a = read_data("data/CleanedSAs/a.txt", label_number=0)
     data_b = read_data("data/CleanedSAs/b.txt", label_number=1)
@@ -69,7 +83,7 @@ def main():
     y = data[:, 1]
     y = to_categorical(y)
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.01)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.01, shuffle=False)
 
     tok = Tokenizer(num_words=max_words)
     tok.fit_on_texts(x_train)
@@ -110,18 +124,36 @@ def main():
     history = model.fit(sequences_matrix, y_train, batch_size=batch_size, epochs=epochs, verbose=1,
                         callbacks=[checkpoint], validation_split=0.15)
 
-    # model.save_weights('weights_cnn.h5')
+    model.save_weights('weights_cnn.h5')
 
     test_sequences = tok.texts_to_sequences(x_test)
     test_sequences_matrix = sequence.pad_sequences(test_sequences, maxlen=max_len)
     accr = model.evaluate(test_sequences_matrix, y_test)
     print('Test set\n  Loss: {:0.3f}\n  Accuracy: {:0.3f}'.format(accr[0], accr[1]))
 
+    # finding the errors in predicting
+    mypredicting = model.predict(test_sequences_matrix)
+    mypredicting_max = np.empty_like(mypredicting)
+    for i in range(len(mypredicting)):
+        mypredicting_max[i, :] = np.int8(mypredicting[i, :] == mypredicting[i, :].max())
+    comparing = np.all(mypredicting_max == y_test, axis=1)
+    with open("./results/wrongAnswers" + '.csv', 'w') as f:
+        f.write("جمله" + "," + "نوع تشخیص" + "," + "پاسخ درست" + "\n")
+        for i in range(len(comparing)):
+            if comparing[i] == False:
+                f.write(x_test[i])
+                f.write("," + dictionaryOfTypes.get(mypredicting_max[i, :].max()))
+                f.write("," + dictionaryOfTypes.get(y_test[i, :].max()))
+                f.write("\n")
+
+    ### LOAD and TEST model
+    # TODO this task
+
     #### plot
     plt.style.use('ggplot')
 
     acc = history.history['acc']
-    val_acc = history.history['val_accuracy']
+    val_acc = history.history['val_acc']
     loss = history.history['loss']
     val_loss = history.history['val_loss']
     x = range(1, len(acc) + 1)
