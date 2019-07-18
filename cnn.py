@@ -51,9 +51,12 @@ def testClass():
 
 def main():
     ## parameters
-    max_words = 10000
-    max_len = 1000
-    embedding_size = 100
+    ##TODO 1000 is too high for max_len and all tokens are about 17600 why 10000
+    # and about the embedding why 100 ?
+
+    max_words = 15000
+    max_len = 70
+    embedding_size = 150
 
     num_filters = 512
     filter_sizes = [3, 4, 5]
@@ -150,6 +153,9 @@ def main():
 
     ### LOAD and TEST model
     # TODO this task
+
+    ### k-fold analysis
+    #TODO this task
 
     #### plot
     plt.style.use('ggplot')

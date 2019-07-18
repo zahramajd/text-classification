@@ -130,8 +130,8 @@ def plotting(dataframe, name, color='C0'):
     plt.xlabel('Tokens')
     plt.title("distribution " + name, y=0.5, loc='right')
     plt.legend(loc='upper right')
-    plt.show()
     plt.savefig("./results/data-Analysis/plot/" + name)
+    plt.show()
 
 
 def main():
@@ -140,6 +140,16 @@ def main():
     for i in range(len(fullPath)):
         data = read_data(fullPath[i], label_number=0)
         preProcessingAnalysis(data, str(i))
+
+    data_a = read_data("data/CleanedSAs/a.txt", label_number=0)
+    data_b = read_data("data/CleanedSAs/b.txt", label_number=1)
+    data_c = read_data("data/CleanedSAs/c.txt", label_number=2)
+    data_d = read_data("data/CleanedSAs/d.txt", label_number=3)
+    data_e = read_data("data/CleanedSAs/e.txt", label_number=4)
+    data_f = read_data("data/CleanedSAs/f.txt", label_number=5)
+    data_g = read_data("data/CleanedSAs/g.txt", label_number=6)
+    fulldata = np.concatenate((data_a, data_b, data_c, data_d, data_e, data_f, data_g), axis=0)
+    preProcessingAnalysis(fulldata, 'full')
 
 
 if __name__ == '__main__': main()
