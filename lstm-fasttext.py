@@ -20,10 +20,19 @@ import tensorflow.keras.backend as K
 
 
 # parameters
+epochs = 20
 max_words = 1000
 max_len = 150
 embedding_dimension = 300
 top_freq_word_to_use = 40000
+
+dictionaryOfTypes = {5: "انتقال اطلاعات",
+                        2: "دستوري",
+                        6: "روايت كردن مطلب",
+                        0: "پرسشي",
+                        4: "نقل قول",
+                        1: "خواهشي",
+                        3: "تهديد"}
 
 word2vec = []
 idx2word = {}
@@ -126,9 +135,30 @@ model.compile(loss='categorical_crossentropy', optimizer=RMSprop(), metrics=['ac
 
 history = model.fit(sequences_matrix, y_train,
             batch_size=128, 
-            epochs=20,
+            epochs=epochs,
             validation_split=0.15)
 
+model.save_weights('weights_lstm_fasttext.h5')
+
+test_sequences = tok.texts_to_sequences(x_test)
+test_sequences_matrix = sequence.pad_sequences(test_sequences,maxlen=max_len)
+accr = model.evaluate(test_sequences_matrix, y_test)
+print('Test set\n  Loss: {:0.3f}\n  Accuracy: {:0.3f}'.format(accr[0],accr[1]))
+
+# finding the errors in predicting
+mypredicting = model.predict(test_sequences_matrix)
+mypredicting_max = np.empty_like(mypredicting)
+for i in range(len(mypredicting)):
+    mypredicting_max[i, :] = np.int8(mypredicting[i, :] == mypredicting[i, :].max())
+comparing = np.all(mypredicting_max == y_test, axis=1)
+with open("./results/wrongAnswers/" + "lstm-fasttext" + '.csv', 'w') as f:
+    f.write("جمله" + "," + "نوع تشخیص" + "," + "پاسخ درست" + "\n")
+    for i in range(len(comparing)):
+        if comparing[i] == False:
+            f.write(x_test[i])
+            f.write("," + dictionaryOfTypes.get(np.argmax(mypredicting_max[i, :])))
+            f.write("," + dictionaryOfTypes.get(np.argmax(y_test[i, :])))
+            f.write("\n")
 
 
 #### plot
