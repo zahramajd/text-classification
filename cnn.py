@@ -151,6 +151,19 @@ def main():
                 f.write("," + dictionaryOfTypes.get(np.argmax(y_test[i, :])))
                 f.write("\n")
 
+    ## MyFunny Testing
+    print("اگر دوست دارید متن وترد کنید و اگر نه e را بفرستید")
+    a = [input()]
+    a_test_sequences = tok.texts_to_sequences(a)
+    a_test_sequences_matrix = sequence.pad_sequences(a_test_sequences, maxlen=max_len)
+    if a != ["e"]:
+        a_mypredicting = model.predict(a_test_sequences_matrix)
+        a_mypredicting_max = np.empty_like(a_mypredicting)
+        for i in range(len(a_mypredicting)):
+            a_mypredicting_max[i, :] = np.int8(a_mypredicting[i, :] == a_mypredicting[i, :].max())
+            print(dictionaryOfTypes.get(np.argmax(a_mypredicting_max[i, :])))
+    ####################################################################################
+
     ### LOAD and TEST model
     # TODO this task
 
