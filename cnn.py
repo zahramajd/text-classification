@@ -80,6 +80,11 @@ def main():
     data_f = read_data("data/CleanedSAs/f.txt", label_number=5)
     data_g = read_data("data/CleanedSAs/g.txt", label_number=6)
 
+
+    #### Data Augmentation this also needs new method IF WE WANT Augument or not
+    ##TODO data augmentation
+
+
     data = np.concatenate((data_a, data_b, data_c, data_d, data_e, data_f, data_g), axis=0)
     np.random.shuffle(data)
 
@@ -120,6 +125,10 @@ def main():
 
     checkpoint = ModelCheckpoint('weights_cnn.hdf5', monitor='val_accuracy', verbose=1, save_best_only=True,
                                  mode='auto')
+
+    ### TODO check for Deference between checkpoint and model and how to use it
+
+
     adam = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 
     model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy'])
@@ -156,7 +165,7 @@ def main():
     a = [input()]
     a_test_sequences = tok.texts_to_sequences(a)
     a_test_sequences_matrix = sequence.pad_sequences(a_test_sequences, maxlen=max_len)
-    if a != ["e"]:
+    while a != ["e"]:
         a_mypredicting = model.predict(a_test_sequences_matrix)
         a_mypredicting_max = np.empty_like(a_mypredicting)
         for i in range(len(a_mypredicting)):
@@ -164,12 +173,20 @@ def main():
             print(dictionaryOfTypes.get(np.argmax(a_mypredicting_max[i, :])))
     ####################################################################################
 
-    ### LOAD and TEST model
+    ###
+
+    ### LOAD and TEST model this needs new method I think
     # TODO this task
 
     ### k-fold analysis
     #TODO this task
 
+    ### Confutsion Matrix
+    ## TODO this task
+    # labels = list(y_test)
+    # predictions = list(mypredicting)
+    # confusion_matrix = tf.confusion_matrix(labels, predictions)
+    # print(confusion_matrix)
 
 
     #### plot
