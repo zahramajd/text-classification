@@ -58,8 +58,8 @@ def main():
     max_len = 70
     embedding_size = 150
 
-    num_filters = 512
-    filter_sizes = [3, 4, 5]
+    num_filters = [64,128,256,512]
+    filter_sizes = [3, 4, 5,7]
     drop = 0.5
     batch_size = 30
     epochs = 20
@@ -105,19 +105,22 @@ def main():
     embedding = Embedding(max_words, embedding_size, input_length=max_len)(inputs)
     reshape = Reshape((max_len, embedding_size, 1))(embedding)
 
-    conv_0 = Conv2D(num_filters, kernel_size=(filter_sizes[0], embedding_size), padding='valid',
+    conv_0 = Conv2D(num_filters[0], kernel_size=(filter_sizes[0], embedding_size), padding='valid',
                     kernel_initializer='normal', activation='relu')(reshape)
-    conv_1 = Conv2D(num_filters, kernel_size=(filter_sizes[1], embedding_size), padding='valid',
+    conv_1 = Conv2D(num_filters[1], kernel_size=(filter_sizes[0], embedding_size), padding='valid',
                     kernel_initializer='normal', activation='relu')(reshape)
-    conv_2 = Conv2D(num_filters, kernel_size=(filter_sizes[2], embedding_size), padding='valid',
+    conv_2 = Conv2D(num_filters[2], kernel_size=(filter_sizes[0], embedding_size), padding='valid',
+                    kernel_initializer='normal', activation='relu')(reshape)
+    conv_3 = Conv2D(num_filters[3], kernel_size=(filter_sizes[0], embedding_size), padding='valid',
                     kernel_initializer='normal', activation='relu')(reshape)
 
     maxpool_0 = MaxPool2D(pool_size=(max_len - filter_sizes[0] + 1, 1), strides=(1, 1), padding='valid')(conv_0)
-    maxpool_1 = MaxPool2D(pool_size=(max_len - filter_sizes[1] + 1, 1), strides=(1, 1), padding='valid')(conv_1)
-    maxpool_2 = MaxPool2D(pool_size=(max_len - filter_sizes[2] + 1, 1), strides=(1, 1), padding='valid')(conv_2)
+    maxpool_1 = MaxPool2D(pool_size=(max_len - filter_sizes[0] + 1, 1), strides=(1, 1), padding='valid')(conv_1)
+    maxpool_2 = MaxPool2D(pool_size=(max_len - filter_sizes[0] + 1, 1), strides=(1, 1), padding='valid')(conv_2)
+    maxpool_3 = MaxPool2D(pool_size=(max_len - filter_sizes[0] + 1, 1), strides=(1, 1), padding='valid')(conv_3)
 
-    concatenated_tensor = Concatenate(axis=1)([maxpool_0, maxpool_1, maxpool_2])
-    flatten = Flatten()(concatenated_tensor)
+    # concatenated_tensor = Concatenate(axis=1)([maxpool_0, maxpool_1, maxpool_2,maxpool_3])
+    flatten = Flatten()(maxpool_3)
     dropout = Dropout(drop)(flatten)
     output = Dense(units=7, activation='softmax')(dropout)
 
